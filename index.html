@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gaming Day - Competencia Escolar</title>
+  <meta name="description" content="Gaming Day: torneo de videojuegos de la escuela. Información, horarios, reglas y registro." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="defaults.js"></script>
+  <script src="registration-sync.js"></script>
+
+
+
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+  <!-- Portada de Bienvenida -->
+  <div id="welcome-splash" class="fixed inset-0 z-[10000] flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
+    <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 20% 30%, rgba(168,85,247,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(236,72,153,0.4) 0%, transparent 50%);"></div>
+    <div class="relative text-center px-6">
+      <div class="text-6xl md:text-8xl mb-6 animate-bounce">🎮</div>
+      <h1 class="welcome-title text-3xl md:text-6xl font-extrabold text-white tracking-wide drop-shadow-2xl">
+        Bienvenido al
+      </h1>
+      <h2 class="welcome-title-big mt-2 text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-purple-400 tracking-wider drop-shadow-2xl">
+        GAMING DAY
+      </h2>
+      <div class="mt-8 flex justify-center gap-2">
+        <span class="welcome-dot w-3 h-3 rounded-full bg-pink-400"></span>
+        <span class="welcome-dot w-3 h-3 rounded-full bg-purple-400" style="animation-delay:0.2s"></span>
+        <span class="welcome-dot w-3 h-3 rounded-full bg-indigo-400" style="animation-delay:0.4s"></span>
+      </div>
+    </div>
+  </div>
+  <style>
+    #welcome-splash { animation: welcomeFadeOut 0.8s ease-in-out 3.2s forwards; }
+    #welcome-splash.hidden-splash { display: none; }
+    .welcome-title { animation: welcomeSlideUp 0.9s ease-out both; }
+    .welcome-title-big { animation: welcomeSlideUp 0.9s ease-out 0.25s both; }
+    .welcome-dot { animation: welcomePulse 1.2s ease-in-out infinite; }
+    @keyframes welcomeFadeOut { to { opacity: 0; visibility: hidden; } }
+    @keyframes welcomeSlideUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes welcomePulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.4); }
+    }
+  </style>
+  <script>
+    (function() {
+      document.body.style.overflow = 'hidden';
+      setTimeout(function() {
+        var splash = document.getElementById('welcome-splash');
+        if (splash) splash.classList.add('hidden-splash');
+        document.body.style.overflow = '';
+      }, 4000);
+    })();
+  </script>
+
+  <header class="relative z-50 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 flex items-center justify-between">
+      <div class="flex items-center gap-2 md:gap-4">
+        <img src="Logo_PCB.png" alt="Logo de la Escuela Superior Vocacional Pablo Colón Berdecia"
+             class="w-12 h-12 md:w-14 md:h-14 object-contain p-1 bg-white/10 rounded-lg" />
+        <div>
+          <h1 id="site-title" class="text-xl md:text-2xl font-extrabold">Gaming Day</h1>
+          <p id="site-subtitle" class="text-xs md:text-sm opacity-90">Torneo de videojuegos</p>
+        </div>
+      </div>
+      <nav class="hidden md:flex gap-6 items-center">
+        <a href="#about" class="hover:underline">Acerca</a>
+        <a href="#schedule" class="hover:underline">Horario</a>
+        <a href="#rules" class="hover:underline">Reglas</a>
+        <a href="#bracket" class="hover:underline">Clasificación</a>
+        <a href="#gallery" class="hover:underline">Galería</a>
+        <a href="#trailers" class="hover:underline">Trailers</a>
+        <a href="#contact" class="hover:underline">Contacto</a>
+        <button onclick="openAdminPanel()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-bold transition-all duration-300">🔧 Admin</button>
+        <a id="pcb-link-desktop" href="https://pcbsystempr-cyber.github.io/pcbsystem/index.html#inicio" target="_blank" rel="noopener noreferrer" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-md font-semibold transition-all duration-300">Visita PCB System</a>
+      </nav>
+
+<script>
+        // Advanced Admin Modal Authentication
+        function openAdminPanel() {
+          if (typeof closeMobileMenu === 'function') {
+            closeMobileMenu();
+          }
+          const modal = document.getElementById('admin-modal');
+          if (!modal) return;
+          modal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        }
+
+        function closeAdminModal() {
+          document.getElementById('admin-modal').classList.add('hidden');
+          document.body.style.overflow = '';
+          resetAdminForm();
+        }
+
+        async function hashString(str) {
+          const encoder = new TextEncoder();
+          const data = encoder.encode(str);
+          const buffer = await crypto.subtle.digest('SHA-256', data);
+          return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function handleAdminLogin(e) {
+          e.preventDefault();
+
+          const username = document.getElementById('admin-username').value;
+          const password = document.getElementById('admin-password').value;
+
+          const [uHash, pHash] = await Promise.all([hashString(username), hashString(password)]);
+
+          if (uHash === '6ab7b2f814c181787ba34806bda7ec8893f62781e88f699d6189eab33233f0e5' &&
+              pHash === 'a0d9dfbdbf5d4af34c0b9dc8102c0d340314ff675b100cff48710a6cc1e94545') {
+            closeAdminModal();
+            window.location.href = 'admin.html';
+            return;
+          }
+          
+          // Error handling
+          const modal = document.getElementById('admin-modal');
+          const errorMsg = document.getElementById('admin-error');
+          const form = document.getElementById('admin-form');
+          
+          let attempts = parseInt(modal.dataset.attempts || 0) + 1;
+          modal.dataset.attempts = attempts;
+          
+          if (attempts >= 3) {
+            errorMsg.textContent = '¡Demasiados intentos! Espera 30 segundos.';
+            errorMsg.classList.remove('hidden');
+            modal.dataset.locked = 'true';
+            form.style.pointerEvents = 'none';
+            setTimeout(() => {
+              modal.dataset.attempts = 0;
+              modal.dataset.locked = 'false';
+              form.style.pointerEvents = '';
+              resetAdminForm();
+            }, 30000);
+            return;
+          }
+          
+          errorMsg.textContent = `Credenciales incorrectas. Intento ${attempts}/3`;
+          errorMsg.classList.remove('hidden');
+          form.classList.add('shake');
+          setTimeout(() => form.classList.remove('shake'), 500);
+        }
+
+        function resetAdminForm() {
+          document.getElementById('admin-form').reset();
+          const error = document.getElementById('admin-error');
+          error.textContent = '';
+          error.classList.add('hidden');
+          document.getElementById('admin-modal').dataset.attempts = 0;
+        }
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeAdminModal();
+        });
+      </script>
+
+      <!-- Mobile: PCB System Button + Menu Button -->
+      <div class="md:hidden flex items-center gap-2">
+        <button type="button" onclick="openAdminPanel()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-xs font-bold transition-all duration-300 flex items-center gap-1" aria-label="Abrir panel de administrador">
+          <span aria-hidden="true">🔧</span>
+          <span>Admin</span>
+        </button>
+
+        <!-- Botón PCB System (móvil) -->
+        <a id="pcb-link-mobile" href="https://pcbsystempr-cyber.github.io/pcbsystem/index.html#inicio" target="_blank" rel="noopener noreferrer" class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-md text-xs font-semibold transition-all duration-300 flex items-center gap-1" aria-label="Visitar PCB System">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor" class="w-4 h-4">
+            <path d="M192 64C86 64 0 150 0 256S86 448 192 448H448c106 0 192-86 192-192s-86-192-192-192H192zM496 248c-22.1 0-40-17.9-40-40s17.9-40 40-40s40 17.9 40 40s-17.9 40-40 40zm-24 56c0 22.1-17.9 40-40 40s-40-17.9-40-40s17.9-40 40-40s40 17.9 40 40zM168 200c0-13.3 10.7-24 24-24s24 10.7 24 24v32h32c13.3 0 24 10.7 24 24s-10.7 24-24 24H216v32c0 13.3-10.7 24-24 24s-24-10.7-24-24V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h32V200z"/>
+          </svg>
+          <span>PCB</span>
+        </a>
+
+        <!-- Mobile Menu Button -->
+        <button type="button" id="mobile-menu-button" class="text-white focus:outline-none md:w-6 md:h-6 w-8 h-8 flex items-center justify-center" aria-label="Abrir menú de navegación" aria-controls="mobile-menu" aria-expanded="false">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+      <!-- Mobile Menu -->
+      <nav id="mobile-menu" class="md:hidden absolute top-full left-0 right-0 z-40 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 shadow-lg hidden">
+        <div class="px-6 py-4 space-y-2">
+          <a href="#about" class="block hover:underline">Acerca</a>
+          <a href="#schedule" class="block hover:underline">Horario</a>
+          <a href="#rules" class="block hover:underline">Reglas</a>
+          <a href="#bracket" class="block hover:underline">Clasificación</a>
+          <a href="#gallery" class="block hover:underline">Galería</a>
+          <a href="#trailers" class="block hover:underline">Trailers</a>
+          <a href="#contact" class="block hover:underline">Contacto</a>
+          <button type="button" onclick="openAdminPanel()" class="block w-full text-left bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-bold transition-all duration-300 mt-4" aria-label="Abrir panel de administrador">🔧 Admin</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+    <!-- Banner de Notificaciones -->
+    <div id="notification-banner" class="mb-8 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-red-500/20 border-l-4 border-yellow-500 rounded-lg p-4 md:p-6 flex items-start justify-between gap-4">
+      <div class="flex items-start gap-4">
+        <span class="text-3xl">🔔</span>
+        <div>
+          <h3 id="notification-title" class="font-bold text-yellow-300 text-lg mb-1">Avisos Importantes</h3>
+          <p id="notification-content" class="text-gray-200 text-sm md:text-base">✅ Inscripciones abiertas hasta el 20 de abril • 📍 Salón de Computec • ⏰ 10:00 AM</p>
+        </div>
+      </div>
+      <button type="button" onclick="document.getElementById('notification-banner').style.display='none'" class="text-gray-400 hover:text-white transition-colors flex-shrink-0" aria-label="Cerrar notificación">✕</button>
+    </div>
+    
+    <!-- Hero -->
+    <section class="text-center">
+      <h2 id="hero-title" class="text-2xl md:text-4xl font-extrabold leading-tight glow">¡Prepárate para el Gaming Day!</h2>
+      <p id="hero-subtitle" class="mt-4 text-base md:text-lg text-gray-300">Únete a la competencia de videojuegos de la escuela. Abierto a estudiantes de todos los grados y niveles.</p>
+      <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+        <a id="hero-primary-link" href="https://pcbsystempr-cyber.github.io/Registro-GD/" target="_blank" rel="noopener noreferrer" class="bg-indigo-600 px-6 md:px-8 py-3 md:py-4 rounded-md font-bold text-base md:text-lg shadow-lg hover:opacity-95 hover:scale-105 transition-all duration-300 animate-pulse">¡Registrarme Ahora!</a>
+        <a id="hero-secondary-link" href="#rules" class="bg-white/10 px-5 py-3 rounded-md">Ver reglas</a>
+      </div>
+
+      <!-- Countdown Timer -->
+      <div class="mt-8 flex flex-wrap justify-center gap-4" id="countdown-container">
+        <div class="bg-white/10 rounded-xl px-5 py-4 min-w-[80px]">
+          <p id="cd-days" class="text-3xl md:text-4xl font-extrabold text-indigo-300">--</p>
+          <p id="cd-days-label" class="text-xs text-gray-400 mt-1">Días</p>
+        </div>
+        <div class="bg-white/10 rounded-xl px-5 py-4 min-w-[80px]">
+          <p id="cd-hours" class="text-3xl md:text-4xl font-extrabold text-purple-300">--</p>
+          <p id="cd-hours-label" class="text-xs text-gray-400 mt-1">Horas</p>
+        </div>
+        <div class="bg-white/10 rounded-xl px-5 py-4 min-w-[80px]">
+          <p id="cd-minutes" class="text-3xl md:text-4xl font-extrabold text-pink-300">--</p>
+          <p id="cd-minutes-label" class="text-xs text-gray-400 mt-1">Minutos</p>
+        </div>
+        <div class="bg-white/10 rounded-xl px-5 py-4 min-w-[80px]">
+          <p id="cd-seconds" class="text-3xl md:text-4xl font-extrabold text-yellow-300">--</p>
+          <p id="cd-seconds-label" class="text-xs text-gray-400 mt-1">Segundos</p>
+        </div>
+      </div>
+      <p id="cd-label" class="mt-3 text-sm text-gray-400">Tiempo para el próximo Gaming Day</p>
+
+    </section>
+      
+
+    <!-- About -->
+    <section id="about" class="mt-8 md:mt-12 bg-white/5 rounded-xl p-4 md:p-8">
+      <h3 id="about-title" class="text-xl md:text-2xl font-bold">¿Qué es Gaming Day?</h3>
+      <p id="about-body" class="mt-3 text-gray-200 text-sm md:text-base">Gaming Day es un evento organizado por el curso de Computec que busca fomentar la competencia sana, el trabajo en equipo y el interés por las disciplinas digitales.</p>
+
+      <h3 id="about-objective-title" class="text-xl md:text-2xl font-bold mt-6">Objetivo</h3>
+      <p id="about-objective-body" class="mt-3 text-gray-200 text-sm md:text-base">Reunir a la comunidad estudiantil alrededor del gaming responsable y el aprendizaje colaborativo.</p>
+    </section>
+
+    <!-- Games -->
+    <section id="games" class="mt-8 md:mt-12 bg-white/5 rounded-xl p-4 md:p-8">
+      <h3 id="games-title" class="text-xl md:text-2xl font-bold">Juegos disponibles</h3>
+      <p id="games-description" class="mt-3 text-gray-200 text-sm md:text-base">Los siguientes juegos mostrados a continuación son los que están disponibles para el Gaming Day. Selecciona tu favorito, revisa la modalidad y el horario, y asegúrate de completar tu inscripción antes de la fecha límite.</p>
+      <div id="games-list" class="mt-6 flex flex-wrap gap-2 md:gap-4">
+      </div>
+    </section>
+
+   <!-- Próximo Torneo -->
+<section id="upcoming-tournaments" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl">
+
+  <h3 id="upcoming-title" class="text-xl md:text-2xl font-bold">Próximo Torneo</h3>
+
+  <p id="upcoming-description" class="mt-3 text-gray-200 text-sm md:text-base upcoming-description">
+    Mantente al día con el próximo torneo de Gaming Day. ¡No te lo pierdas!
+  </p>
+
+  <div class="mt-4 md:mt-6 flex justify-center">
+
+    <!-- 📦 CAJA DEL TORNEO -->
+    <div id="torneo-box"
+         class="w-full max-w-md p-4 md:p-6 rounded-xl md:rounded-2xl shadow-2xl border-4 relative text-white bg-gradient-to-r from-green-900 via-green-800 to-green-900 border-green-600">
+
+      <!-- 🔥 CONTENIDO DINÁMICO DEL ADMIN -->
+      <div id="torneo-content">
+        <p class="text-gray-400 text-sm text-center py-4">⏳ Próximamente...</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+    
+
+    <!-- Schedule -->
+    <section id="schedule" class="mt-8 md:mt-12">
+      <h3 id="schedule-title" class="text-xl md:text-2xl font-bold">Horarios del gaming</h3>
+      <div class="mt-4 grid md:grid-cols-2 gap-4 md:gap-6">
+        <div class="bg-white/5 p-4 md:p-6 rounded-lg">
+          <h4 id="schedule-col-1-title" class="font-semibold text-base md:text-lg">Por la mañana</h4>
+          <ul id="schedule-col-1-items" class="mt-3 text-gray-200 space-y-2 text-sm md:text-base">
+            <li>08:00 - 11:50 | Gaming</li>
+            <li>11:50 - 12:50 | Almuerzo</li>
+            <li>12:50 - 2:15 | Gaming</li>
+          </ul>
+          <h4 id="schedule-col-1-secondary-title" class="font-semibold text-base md:text-lg mt-4">Lugar</h4>
+          <ul id="schedule-col-1-secondary-items" class="mt-3 text-gray-200 space-y-2 text-sm md:text-base">
+            <li>Salón de Computec</li>
+          </ul>
+        </div>
+        <div class="bg-white/5 p-4 md:p-6 rounded-lg">
+          <h4 id="schedule-col-2-title" class="font-semibold text-base md:text-lg">Detalles del evento</h4>
+          <ul id="schedule-col-2-items" class="mt-3 text-gray-200 space-y-2 text-sm md:text-base">
+            <li>📍 Salón de Computec</li>
+            <li>🎮 Mario Kart, NBA, Mortal Kombat, Smash Bros, Impostor</li>
+            <li>🏆 Formato de eliminación directa por juego</li>
+            <li>📋 Registro previo obligatorio</li>
+            <li>👥 Abierto a todos los estudiantes</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bracket / Standings -->
+    <section id="bracket" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl">
+      <h3 id="bracket-title" class="text-xl md:text-2xl font-bold">🏆 Tabla de Clasificación</h3>
+      <p id="bracket-description" class="mt-3 text-gray-200 text-sm md:text-base">Los resultados se actualizarán durante el evento. Sigue el progreso de cada juego aquí.</p>
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-sm md:text-base text-left border-collapse">
+          <thead>
+            <tr class="bg-indigo-700/40">
+              <th class="px-4 py-3 rounded-tl-lg">Juego</th>
+              <th class="px-4 py-3">🥇 1er Lugar</th>
+              <th class="px-4 py-3">🥈 2do Lugar</th>
+              <th class="px-4 py-3 rounded-tr-lg">🥉 3er Lugar</th>
+            </tr>
+          </thead>
+          <tbody id="bracket-body" class="divide-y divide-white/10">
+            <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3 font-semibold">Mario Kart</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+            </tr>
+            <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3 font-semibold">NBA 2K</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+            </tr>
+            <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3 font-semibold">Mortal Kombat</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+            </tr>
+            <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3 font-semibold">Smash Bros</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+            </tr>
+            <tr class="hover:bg-white/5 transition-colors">
+              <td class="px-4 py-3 font-semibold">Impostor</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+              <td class="px-4 py-3 text-gray-400">Por definir</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Rules -->
+    <section id="rules" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl">
+      <h3 id="rules-title" class="text-xl md:text-2xl font-bold">Reglas y conducta</h3>
+      <p id="rules-description" class="mt-3 text-gray-200 text-sm md:text-base">Para asegurar una competencia justa y respetuosa, todas las participantes deben aceptar las siguientes reglas:</p>
+<ul id="reglas-list" class="mt-4 space-y-3 text-gray-200 text-sm md:text-base">
+        <!-- Dynamic rules loaded from localStorage -->
+      </ul>
+    </section>
+
+<!-- ================= GALERÍA SLIDESHOW ================= -->
+<section id="gallery" class="mt-12 bg-gradient-to-br from-purple-900/20 via-black to-indigo-900/20 p-8 rounded-xl border border-purple-500/30">
+  
+  <div class="max-w-5xl mx-auto">
+    <h3 id="gallery-title" class="text-3xl md:text-4xl font-bold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+      🎮 Galería de Fotos
+    </h3>
+    <p id="gallery-subtitle" class="text-gray-300 text-center text-sm md:text-base mb-8">
+      Revive los momentos más épicos de ediciones anteriores del Gaming Day
+    </p>
+
+    <!-- CONTENEDOR SLIDER -->
+    <div class="relative bg-gray-900/50 rounded-2xl overflow-hidden shadow-2xl border border-purple-500/20">
+      
+      <!-- SLIDES CONTAINER -->
+      <div id="slides-wrapper" class="flex h-[300px] md:h-[450px] lg:h-[600px] transition-transform duration-500 ease-in-out">
+          <!-- Imágenes -->
+          <div class="gallery-slide relative flex-shrink-0 w-full h-full">
+            <img src="Galeria de fotos/imagen1.jpeg" alt="Momentos del Gaming Day" class="w-full h-full object-cover" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end">
+              <p class="text-white font-bold text-lg md:text-xl p-4"></p>
+            </div>
+          </div>
+
+          <div class="gallery-slide relative flex-shrink-0 w-full h-full">
+            <img src="Galeria de fotos/imagen2.jpeg" alt="Momentos del Gaming Day" class="w-full h-full object-cover" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end">
+              <p class="text-white font-bold text-lg md:text-xl p-4"></p>
+            </div>
+          </div>
+
+          <div class="gallery-slide relative flex-shrink-0 w-full h-full">
+            <img src="Galeria de fotos/imagen3.jpeg" alt="Momentos del Gaming Day" class="w-full h-full object-cover" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end">
+              <p class="text-white font-bold text-lg md:text-xl p-4"></p>
+            </div>
+          </div>
+
+          <div class="gallery-slide relative flex-shrink-0 w-full h-full">
+            <img src="Galeria de fotos/imagen4.jpeg" alt="Momentos del Gaming Day" class="w-full h-full object-cover" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end">
+              <p class="text-white font-bold text-lg md:text-xl p-4"></p>
+            </div>
+          </div>
+
+          <div class="gallery-slide relative flex-shrink-0 w-full h-full">
+            <img src="Galeria de fotos/imagen5.jpeg" alt="Momentos del Gaming Day" class="w-full h-full object-cover" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end">
+              <p class="text-white font-bold text-lg md:text-xl p-4"></p>
+            </div>
+          </div>
+
+          <div class="gallery-slide relative flex-shrink-0 w-full h-full">
+            <img src="Galeria de fotos/imagen6.jpeg" alt="Momentos del Gaming Day" class="w-full h-full object-cover" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end">
+              <p class="text-white font-bold text-lg md:text-xl p-4"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTONES DE NAVEGACIÓN -->
+        <button id="prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-purple-500/50">
+          ‹
+        </button>
+
+        <button id="next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-purple-500/50">
+          ›
+        </button>
+      </div>
+
+      <!-- INDICADORES (DOTS) -->
+      <div id="gallery-dots" class="flex justify-center gap-2 bg-black/80 py-4">
+        <button class="gallery-dot w-3 h-3 rounded-full bg-purple-500 transition-all duration-300 cursor-pointer" data-index="0"></button>
+      </div>
+    </div>
+  </div>
+
+</section>
+<!-- ===================================================== -->
+
+<!-- ================= TRAILERS SECTION ================= -->
+<section id="trailers" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl">
+  <h3 id="trailers-title" class="text-xl md:text-2xl font-bold text-center">Trailers de los Juegos</h3>
+  <p id="trailers-description" class="mt-3 text-gray-200 text-center text-sm md:text-base">
+    Mira los trailers oficiales de los juegos disponibles en el Gaming Day.
+  </p>
+  <div class="mt-4 flex justify-center">
+    <button id="open-music-modal" type="button" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300">
+      <span aria-hidden="true">🎵</span>
+      <span>Abrir música gaming</span>
+    </button>
+  </div>
+  
+  <div class="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+    <div id="trailers-videos" class="contents"></div>
+    <!-- Mario Kart Trailer -->
+    <!-- Impostor PDFs -->
+    <div class="bg-gray-800/50 rounded-lg overflow-hidden">
+      <div class="p-4 md:p-6">
+        <h4 id="impostor-title" class="font-semibold text-white text-lg md:text-xl mb-4">Impostor - Documentación</h4>
+        <p id="impostor-description" class="text-gray-400 text-sm mb-4">Haz clic en cada imagen para ver en tamaño completo</p>
+        <div id="impostor-images" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+<!-- ===================================================== -->
+
+   <!-- Register -->
+<section id="register" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl">
+  <h3 id="register-title" class="text-xl md:text-2xl font-bold">Registro</h3>
+  <p id="register-description" class="mt-3 text-gray-200 text-sm md:text-base">¡Regístrate ahora para participar en el Gaming Day! Completa el formulario a continuación.</p>
+
+  <div class="mt-6 bg-gradient-to-br from-indigo-700/25 via-purple-700/20 to-pink-700/25 border border-indigo-400/30 rounded-xl p-4 md:p-5">
+    <h4 class="text-base md:text-lg font-semibold">Formulario completo</h4>
+    <p class="text-xs md:text-sm text-gray-300 mt-1">Usa Registro GD para completar la experiencia con QR por Gmail.</p>
+    <a id="register-link" href="https://pcbsystempr-cyber.github.io/Registro-GD/" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center bg-indigo-600 px-6 py-3 rounded-md font-semibold shadow hover:opacity-95 text-sm md:text-base">
+      Registrarme en Registro GD
+    </a>
+    <p id="register-disclaimer" class="text-xs md:text-sm text-gray-300 mt-4">Al registrarte, confirmas que has leído y aceptas el reglamento del Gaming Day. El incumplimiento de las normas podrá conllevar penalidades o descalificación, según determine la organización.</p>
+  </div>
+</section>
+
+
+    <!-- Verificador de Registro -->
+    <section id="verifier" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl">
+      <h3 id="verifier-title" class="text-xl md:text-2xl font-bold mb-2">🔍 Verificador de Registro</h3>
+      <p id="verifier-description" class="text-gray-200 text-sm md:text-base mb-6">¿Ya te registraste? Verifica tu estado ingresando tu email, nombre o código de jugador.</p>
+      
+      <div class="bg-white/5 p-4 md:p-6 rounded-lg">
+        <form id="verifier-form" class="flex flex-col sm:flex-row gap-3">
+          <input 
+            type="text" 
+            id="verifier-email" 
+            placeholder="Ingresa tu email, nombre o código" 
+            class="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            required
+          >
+          <button 
+            id="verifier-submit"
+            type="submit" 
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105"
+          >
+            Verificar
+          </button>
+        </form>
+        <div id="verifier-result" class="mt-4 hidden p-3 rounded-lg"></div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="mt-8 md:mt-12 bg-white/5 p-4 md:p-8 rounded-xl text-center">
+      <h3 id="contact-title" class="text-xl md:text-2xl font-bold">Contacto</h3>
+      <p id="contact-description" class="mt-3 text-gray-200 text-sm md:text-base">¿Tienes preguntas? Contáctanos a través de los siguientes medios:</p>
+      <ul class="mt-4 space-y-3 text-gray-200 text-sm md:text-base">
+        <li>📧 <strong id="contact-email-label">Email</strong>: <a id="contact-email-link" href="mailto:computec.pcb@gmail.com" class="text-indigo-400 hover:underline">computec.pcb@gmail.com</a></li>
+        <li>🌐 <strong id="contact-web-label">Web</strong>: <a id="contact-web-link" href="https://pcbsystempr-cyber.github.io/pcbsystem/index.html" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline">PCB System</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Music Modal -->
+  <div id="music-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-gray-900 rounded-lg p-4 md:p-6 max-w-4xl w-full mx-auto relative max-h-[90vh] overflow-y-auto">
+      <button type="button" id="close-music-modal" class="absolute top-4 right-4 text-white text-2xl hover:text-red-400 z-10" aria-label="Cerrar modal de música">&times;</button>
+      <h2 class="text-xl md:text-2xl font-bold text-center mb-4 md:mb-6 text-white pr-8">Música Gaming</h2>
+      <div class="flex flex-col lg:flex-row gap-4 md:gap-6">
+        <!-- YouTube Iframe -->
+        <div class="w-full lg:flex-1">
+          <div class="relative w-full bg-black rounded-lg overflow-hidden" style="padding-bottom: 56.25%;">
+            <iframe id="music-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/jfKfPfyJRdk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Reproductor de música gaming"></iframe>
+          </div>
+        </div>
+        <!-- Genre Gallery -->
+        <div class="w-full lg:flex-1 grid grid-cols-2 gap-2 md:gap-4 auto-rows-max">
+          <button type="button" class="genre-btn bg-gray-800 p-3 md:p-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-all duration-300 border-2 border-transparent hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-400/50 text-sm md:text-base" data-video="dQw4w9WgXcQ">
+            <span class="text-xl md:text-2xl mb-2 block" aria-hidden="true">🎧</span><span>Trap Gaming</span>
+          </button>
+          <button type="button" class="genre-btn bg-gray-800 p-3 md:p-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-all duration-300 border-2 border-transparent hover:border-green-400 hover:shadow-lg hover:shadow-green-400/50 text-sm md:text-base" data-video="jfKfPfyJRdk">
+            <span class="text-xl md:text-2xl mb-2 block" aria-hidden="true">☕</span><span>Lo-Fi Chill</span>
+          </button>
+          <button type="button" class="genre-btn bg-gray-800 p-3 md:p-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-all duration-300 border-2 border-transparent hover:border-purple-400 hover:shadow-lg hover:shadow-purple-400/50 text-sm md:text-base" data-video="8nXqcugV2Yk">
+            <span class="text-xl md:text-2xl mb-2 block" aria-hidden="true">🏰</span><span>Epic Orchestral</span>
+          </button>
+          <button type="button" class="genre-btn bg-gray-800 p-3 md:p-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-all duration-300 border-2 border-transparent hover:border-pink-400 hover:shadow-lg hover:shadow-pink-400/50 text-sm md:text-base" data-video="y6120QOlsfU">
+            <span class="text-xl md:text-2xl mb-2 block" aria-hidden="true">⚡</span><span>Electronic</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Mobile Menu Toggle
+  (function () {
+    const btn = document.getElementById('mobile-menu-button');
+    const menu = document.getElementById('mobile-menu');
+    if (!btn || !menu) return;
+
+    const menuItems = menu.querySelectorAll('a, button');
+
+    function openMenu() {
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMenu() {
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    window.closeMobileMenu = closeMenu;
+
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation();
+
+      if (menu.classList.contains('hidden')) {
+        openMenu();
+        return;
+      }
+
+      closeMenu();
+    });
+
+    menu.addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+
+    menuItems.forEach(function (item) {
+      item.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function () {
+      if (!menu.classList.contains('hidden')) {
+        closeMenu();
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 768) {
+        closeMenu();
+      }
+    });
+  })();
+</script>
+
+<!-- Footer -->
+<footer class="bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 text-white mt-16">
+  <div class="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <!-- Columna 1: Información -->
+      <div>
+        <h4 id="footer-brand-title" class="text-lg font-bold mb-4">Gaming Day</h4>
+        <p id="footer-description" class="text-gray-300 text-sm">
+          Torneo de videojuegos organizado por el curso de Computec en la Escuela Superior Vocacional Pablo Colón Berdecia.
+        </p>
+        <div class="mt-4 flex items-center gap-3">
+          <img src="Logo_PCB.png" alt="Logo PCB" class="h-16 w-16 object-contain">
+          <img src="LogoComputec.png" alt="Logo Computec" class="h-16 w-16 object-contain">
+        </div>
+      </div>
+
+      <!-- Columna 2: Enlaces Rápidos -->
+      <div>
+        <h4 class="text-lg font-bold mb-4">Enlaces Rápidos</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#games" class="text-gray-300 hover:text-white transition-colors">Juegos</a></li>
+          <li><a href="#schedule" class="text-gray-300 hover:text-white transition-colors">Horario</a></li>
+          <li><a href="#rules" class="text-gray-300 hover:text-white transition-colors">Reglas</a></li>
+          <li><a href="#bracket" class="text-gray-300 hover:text-white transition-colors">Clasificación</a></li>
+          <li><a href="#gallery" class="text-gray-300 hover:text-white transition-colors">Galería</a></li>
+          <li><a href="#trailers" class="text-gray-300 hover:text-white transition-colors">Trailers</a></li>
+          <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Contacto -->
+      <div>
+        <h4 class="text-lg font-bold mb-4">Contacto</h4>
+        <ul class="space-y-2 text-sm text-gray-300">
+          <li>
+            <strong>Email:</strong><br>
+            <a id="footer-email-link" href="mailto:computec.pcb@gmail.com" class="hover:text-white transition-colors">computec.pcb@gmail.com</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Línea divisoria -->
+    <div class="border-t border-white/20 mt-8 pt-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-300">
+        <p id="footer-copyright">&copy; 2026 Gaming Day - Escuela Superior Vocacional Pablo Colón Berdecia</p>
+        <p>Organizado por <strong id="footer-organizer" class="text-white">Computec</strong></p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- Admin Login Modal -->
+  <div id="admin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+    <div class="bg-gradient-to-br from-gray-900 via-purple-900/30 to-indigo-900 border border-purple-500/50 rounded-3xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl shadow-purple-500/25 animate-in fade-in zoom-in duration-300">
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-2">Gaming Day Admin</h2>
+        <p class="text-gray-400 text-sm">Ingresa tus credenciales de administrador</p>
+      </div>
+      
+      <form id="admin-form" class="space-y-4" onsubmit="handleAdminLogin(event)">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Usuario</label>
+          <input id="admin-username" type="text" required autocomplete="username" class="w-full px-4 py-3 bg-white/10 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-white placeholder-gray-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+          <input id="admin-password" type="password" required autocomplete="current-password" class="w-full px-4 py-3 bg-white/10 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-white placeholder-gray-400">
+        </div>
+        <div id="admin-error" class="text-red-400 text-sm hidden p-2 bg-red-500/10 rounded-lg border border-red-500/30"></div>
+        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+          Acceder al Panel
+        </button>
+      </form>
+      
+      <button onclick="closeAdminModal()" class="w-full mt-4 text-gray-400 hover:text-white transition-colors text-sm underline">Cancelar</button>
+      
+      <div class="mt-6 pt-6 border-t border-gray-700 text-xs text-gray-500 text-center">
+        <p>3 intentos máximos • 30s bloqueo tras fallos</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="index.js"></script>
+
+</body>
+</html>

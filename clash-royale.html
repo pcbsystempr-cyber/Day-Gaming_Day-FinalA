@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clash Royale - Gaming Day</title>
+  <meta name="description" content="Información sobre Clash Royale en Gaming Day." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glow { text-shadow: 0 2px 12px rgba(99,102,241,0.25); }
+
+    /* Smooth page transitions */
+    body {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      header .max-w-6xl { padding: 1rem !important; }
+      header h1 { font-size: 1.25rem !important; }
+      header p { font-size: 0.75rem !important; }
+      header img { width: 2.5rem !important; height: 2.5rem !important; }
+      header .flex.items-center { gap: 0.5rem !important; }
+      main { padding: 1.5rem 1rem !important; }
+      main section { padding: 1.5rem !important; }
+      h2 { font-size: 1.5rem !important; }
+      h3 { font-size: 1.125rem !important; }
+      .grid.md\\:grid-cols-2 { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+      a.bg-indigo-600, a.bg-white\/10 { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem !important; cursor: pointer; -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2); touch-action: manipulation; }
+      a[href*="index.html"] { pointer-events: auto !important; cursor: pointer !important; -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3) !important; touch-action: manipulation !important; }
+      .flex.justify-between { flex-direction: column; gap: 1rem; align-items: stretch !important; }
+      .flex.gap-3 { width: 100%; gap: 0.5rem !important; }
+      .flex.gap-3 a.bg-white\/10 { flex: 1; font-size: 0.7rem !important; padding: 0.5rem 0.25rem !important; white-space: nowrap; min-width: 0; gap: 0.25rem !important; }
+      .flex.gap-3 a span { overflow: hidden; text-overflow: ellipsis; font-size: 0.7rem !important; }
+      .flex.gap-3 a svg { flex-shrink: 0; width: 1rem !important; height: 1rem !important; }
+      footer .grid { gap: 2rem !important; }
+      footer h4 { font-size: 1rem !important; }
+      footer .h-16 { height: 3rem !important; width: 3rem !important; }
+      nav { display: none; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .max-w-6xl { max-width: 90%; }
+      main { padding: 1.5rem !important; }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+  <header class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8 flex items-center justify-between">
+      <div class="flex items-center gap-2 md:gap-4">
+        <img src="Logo_PCB.png" alt="Logo de la Escuela Superior Vocacional Pablo Colón Berdecia"
+             class="w-10 h-10 md:w-12 md:h-12 object-contain p-1 bg-white/10 rounded-lg" />
+        <div>
+          <h1 class="text-lg md:text-2xl font-extrabold">Gaming Day</h1>
+          <p class="text-xs md:text-sm opacity-90 hidden sm:block">Torneo de videojuegos - Escuela Superior Vocacional Pablo Colón Berdecia</p>
+          <p class="text-xs opacity-90 sm:hidden">ESV Pablo Colón Berdecia</p>
+        </div>
+      </div>
+      <nav class="hidden md:flex gap-6 items-center">
+        <a href="index.html" class="hover:underline">Inicio</a>
+        <a href="index.html#about" class="hover:underline">Acerca</a>
+        <a href="index.html#schedule" class="hover:underline">Horario</a>
+        <a href="index.html#rules" class="hover:underline">Reglas</a>
+        <a href="index.html#contact" class="bg-white/10 px-4 py-2 rounded-md">Contacto</a>
+      </nav>
+      <a href="index.html" class="md:hidden text-white" aria-label="Volver al inicio">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
+  <main class="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
+    <section class="bg-white/5 rounded-xl p-4 md:p-8">
+      <h2 class="text-3xl font-extrabold glow">Clash Royale</h2>
+      <p class="mt-4 text-lg text-gray-300">Batallas estratégicas en tiempo real con cartas y torres.</p>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-xl font-bold">Información del Juego</h3>
+          <ul class="mt-4 space-y-2 text-gray-200">
+            <li><strong>Desarrollador:</strong> Supercell</li>
+            <li><strong>Género:</strong> Estrategia en tiempo real</li>
+            <li><strong>Plataforma:</strong> Móvil (Android/iOS)</li>
+            <li><strong>Modo de Juego:</strong> 1 vs 1</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold">Detalles del Torneo</h3>
+          <ul class="mt-4 space-y-2 text-gray-200">
+            <li><strong>Capacidad de Jugadores:</strong> 2 (1 vs 1)</li>
+            <li><strong>Modalidad:</strong> Eliminación directa</li>
+            <li><strong>Duración:</strong> 3-5 minutos por partida</li>
+            <li><strong>Equipos:</strong> Individual</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h3 class="text-xl font-bold">Reglas Específicas</h3>
+        <ul class="mt-4 space-y-2 text-gray-200">
+          <li>• Se juega en modo 1 vs 1 con mazos estándar.</li>
+          <li>• No se permiten cartas legendarias o épicas para equilibrar la competencia.</li>
+          <li>• El ganador es quien destruya las torres del oponente primero.</li>
+        </ul>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href="https://pcbsystempr-cyber.github.io/Registro-GD/" target="_blank" rel="noopener noreferrer" class="bg-indigo-600 px-6 py-3 rounded-md font-semibold shadow hover:opacity-95">Registrarme</a>
+      </div>
+
+      <!-- Navegación entre juegos -->
+      <div class="mt-8 flex justify-between items-center border-t border-gray-700 pt-6">
+        <a href="index.html#games" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          <span>Volver a Juegos</span>
+        </a>
+        <div class="flex gap-3">
+          <a href="nba.html" class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-md hover:bg-white/20 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            <span>Siguiente</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 text-white mt-16">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Columna 1: Información -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Gaming Day</h4>
+          <p class="text-gray-300 text-sm">
+            Torneo de videojuegos organizado por el curso de Computec en la Escuela Superior Vocacional Pablo Colón Berdecia.
+          </p>
+          <div class="mt-4 flex items-center gap-3">
+            <img src="Logo_PCB.png" alt="Logo PCB" class="h-16 w-16 object-contain">
+            <img src="LogoComputec.png" alt="Logo Computec" class="h-16 w-16 object-contain">
+          </div>
+        </div>
+
+        <!-- Columna 2: Enlaces Rápidos -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Enlaces Rápidos</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="index.html#games" class="text-gray-300 hover:text-white transition-colors">Juegos</a></li>
+            <li><a href="index.html#schedule" class="text-gray-300 hover:text-white transition-colors">Horario</a></li>
+            <li><a href="index.html#rules" class="text-gray-300 hover:text-white transition-colors">Reglas</a></li>
+            <li><a href="index.html#gallery" class="text-gray-300 hover:text-white transition-colors">Galería</a></li>
+            <li><a href="index.html#contact" class="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: Contacto -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Contacto</h4>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li>
+              <strong>Email:</strong><br>
+              <a href="mailto:computec.pcb@gmail.com" class="hover:text-white transition-colors">computec.pcb@gmail.com</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Línea divisoria -->
+      <div class="border-t border-white/20 mt-8 pt-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-300">
+          <p>&copy; 2026 Gaming Day - Escuela Superior Vocacional Pablo Colón Berdecia</p>
+          <p>Organizado por <strong class="text-white">Computec</strong></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

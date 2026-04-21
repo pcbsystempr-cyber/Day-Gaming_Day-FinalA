@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - Gaming Day</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="defaults.js"></script>
+  <script src="registration-sync.js"></script>
+  <style>
+    .glow { text-shadow: 0 2px 12px rgba(99,102,241,0.25); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .preview-box { background: rgba(255,255,255,0.05); border: 1px solid #4b5563; }
+    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    main { display: none; }
+    main.authenticated { display: block; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1rem !important; }
+      header h1 { font-size: 1rem !important; }
+      header img { width: 2rem !important; height: 2rem !important; }
+      main { padding: 1rem !important; max-width: 100% !important; }
+      .tab-btn { padding: 0.75rem 0.5rem !important; font-size: 0.75rem !important; }
+      input, textarea, select { font-size: 16px !important; }
+      button { min-height: 44px; }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <header class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6 flex items-center gap-2 md:gap-4 flex-wrap">
+      <img src="Logo_PCB.png" alt="Logo" class="w-8 h-8 md:w-12 md:h-12 object-contain" />
+      <h1 class="text-lg md:text-2xl font-extrabold glow flex-1">Gaming Day - Admin</h1>
+      <a href="index.html" class="bg-white/20 px-3 md:px-4 py-2 rounded-md hover:bg-white/30 transition-all text-xs md:text-sm font-semibold whitespace-nowrap">← Volver</a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-4 md:p-6">
+    <div id="flash-message" class="mb-6 p-4 rounded-lg hidden"></div>
+
+    <div class="bg-white/5 rounded-xl p-1 mb-8">
+      <div class="flex bg-gray-800/50 rounded-lg overflow-x-auto gap-1">
+        <button class="tab-btn flex-1 p-3 md:p-4 font-bold bg-purple-600 rounded-md whitespace-nowrap" data-tab="general">Contenido General</button>
+        <button class="tab-btn flex-1 p-3 md:p-4 font-bold whitespace-nowrap" data-tab="torneo">Próximo Torneo</button>
+        <button class="tab-btn flex-1 p-3 md:p-4 font-bold whitespace-nowrap" data-tab="reglas">Reglas</button>
+        <button class="tab-btn flex-1 p-3 md:p-4 font-bold whitespace-nowrap" data-tab="galeria">Galería</button>
+      </div>
+    </div>
+
+    <section id="general" class="tab-panel active space-y-8">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4 bg-white/5 rounded-xl p-5">
+          <h2 class="text-2xl font-bold">Header y avisos</h2>
+          <input id="header-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título del sitio" />
+          <input id="header-subtitle" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Subtítulo del sitio" />
+          <input id="header-pcb-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto PCB escritorio" />
+          <input id="header-pcb-mobile-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto PCB móvil" />
+          <input id="header-pcb-href" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Enlace PCB" />
+          <label class="flex items-center gap-2 text-sm"><input id="notification-visible" type="checkbox" class="h-4 w-4" /> Mostrar banner</label>
+          <input id="notification-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título del aviso" />
+          <textarea id="notification-message" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Mensaje del aviso"></textarea>
+        </div>
+
+        <div class="space-y-4 bg-white/5 rounded-xl p-5">
+          <h2 class="text-2xl font-bold">Hero y cuenta regresiva</h2>
+          <input id="hero-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título principal" />
+          <textarea id="hero-subtitle" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Texto principal"></textarea>
+          <input id="hero-primary-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto botón principal" />
+          <input id="hero-primary-href" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Enlace botón principal" />
+          <input id="hero-secondary-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto botón secundario" />
+          <input id="hero-secondary-href" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Enlace botón secundario" />
+          <input id="hero-countdown-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Etiqueta countdown" />
+          <input id="hero-countdown-target" type="datetime-local" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" />
+          <input id="hero-live-message" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Mensaje cuando el evento empieza" />
+          <div class="grid grid-cols-2 gap-3">
+            <input id="hero-countdown-days-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto días" />
+            <input id="hero-countdown-hours-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto horas" />
+            <input id="hero-countdown-minutes-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto minutos" />
+            <input id="hero-countdown-seconds-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto segundos" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <input id="hero-countdown-days-value" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Número días" />
+            <input id="hero-countdown-hours-value" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Número horas" />
+            <input id="hero-countdown-minutes-value" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Número minutos" />
+            <input id="hero-countdown-seconds-value" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Número segundos" />
+          </div>
+          <div class="preview-box rounded-xl p-4">
+            <h3 class="text-sm font-bold uppercase tracking-wide text-gray-300 mb-3">Vista previa countdown</h3>
+            <div class="flex flex-wrap justify-center gap-3 text-center">
+              <div class="bg-white/10 rounded-xl px-4 py-3 min-w-[72px]">
+                <p id="hero-countdown-days-value-preview" class="text-3xl font-extrabold text-indigo-300">00</p>
+                <p id="hero-countdown-days-preview" class="text-xs text-gray-400 mt-1">Días</p>
+              </div>
+              <div class="bg-white/10 rounded-xl px-4 py-3 min-w-[72px]">
+                <p id="hero-countdown-hours-value-preview" class="text-3xl font-extrabold text-purple-300">19</p>
+                <p id="hero-countdown-hours-preview" class="text-xs text-gray-400 mt-1">Horas</p>
+              </div>
+              <div class="bg-white/10 rounded-xl px-4 py-3 min-w-[72px]">
+                <p id="hero-countdown-minutes-value-preview" class="text-3xl font-extrabold text-pink-300">59</p>
+                <p id="hero-countdown-minutes-preview" class="text-xs text-gray-400 mt-1">Minutos</p>
+              </div>
+              <div class="bg-white/10 rounded-xl px-4 py-3 min-w-[72px]">
+                <p id="hero-countdown-seconds-value-preview" class="text-3xl font-extrabold text-yellow-300">12</p>
+                <p id="hero-countdown-seconds-preview" class="text-xs text-gray-400 mt-1">Segundos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4 bg-white/5 rounded-xl p-5">
+          <h2 class="text-2xl font-bold">Acerca y juegos</h2>
+          <input id="about-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título de acerca" />
+          <textarea id="about-body" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Descripción de acerca"></textarea>
+          <input id="about-objective-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título de objetivo" />
+          <textarea id="about-objective-body" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Descripción de objetivo"></textarea>
+          <input id="games-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título de juegos" />
+          <textarea id="games-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Descripción de juegos"></textarea>
+          <input id="upcoming-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título próximo torneo" />
+          <textarea id="upcoming-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción próximo torneo"></textarea>
+          <input id="rules-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título reglas" />
+          <textarea id="rules-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción reglas"></textarea>
+          <input id="gallery-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título galería" />
+          <textarea id="gallery-subtitle" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Subtítulo galería"></textarea>
+          <div id="games-editor" class="space-y-3"></div>
+          <button id="add-game-btn" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 p-3 rounded-lg font-bold">Agregar juego</button>
+          <button id="save-general-btn" type="button" onclick="saveGeneral()" class="w-full bg-green-600 hover:bg-green-700 p-3 rounded-lg font-bold">Guardar contenido general</button>
+        </div>
+
+        <div class="space-y-4 bg-white/5 rounded-xl p-5">
+          <h2 class="text-2xl font-bold">Horario y clasificación</h2>
+          <input id="schedule-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título de horario" />
+          <input id="schedule-col-1-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Columna 1 título" />
+          <textarea id="schedule-col-1-items" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Un item por línea"></textarea>
+          <input id="schedule-col-1-secondary-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título secundario columna 1" />
+          <textarea id="schedule-col-1-secondary-items" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Un item por línea"></textarea>
+          <input id="schedule-col-2-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Columna 2 título" />
+          <textarea id="schedule-col-2-items" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Un item por línea"></textarea>
+          <input id="bracket-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título clasificación" />
+          <textarea id="bracket-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción clasificación"></textarea>
+          <div id="bracket-editor" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4 bg-white/5 rounded-xl p-5">
+          <h2 class="text-2xl font-bold">Trailers y registro</h2>
+          <input id="trailers-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título trailers" />
+          <textarea id="trailers-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción trailers"></textarea>
+          <div id="trailers-editor" class="space-y-3"></div>
+          <input id="impostor-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título documentación impostor" />
+          <textarea id="impostor-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción documentación"></textarea>
+          <div id="impostor-editor" class="space-y-3"></div>
+          <input id="register-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título registro" />
+          <textarea id="register-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción registro"></textarea>
+          <input id="register-button-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto botón registro" />
+          <input id="register-button-href" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Enlace registro" />
+          <textarea id="register-disclaimer" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-24 resize-none" placeholder="Texto legal de registro"></textarea>
+        </div>
+
+        <div class="space-y-4 bg-white/5 rounded-xl p-5">
+          <h2 class="text-2xl font-bold">Verificador, contacto y footer</h2>
+          <input id="verifier-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título verificador" />
+          <textarea id="verifier-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción verificador"></textarea>
+          <input id="verifier-placeholder" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Placeholder verificador" />
+          <input id="verifier-button-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto botón verificador" />
+          <input id="verifier-success-prefix" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto éxito inicial" />
+          <input id="verifier-success-suffix" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto éxito final" />
+          <textarea id="verifier-not-found" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Texto no encontrado"></textarea>
+          <div id="verifier-editor" class="space-y-3"></div>
+          <input id="contact-title" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Título contacto" />
+          <textarea id="contact-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción contacto"></textarea>
+          <input id="contact-email-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Etiqueta email" />
+          <input id="contact-email" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Email" />
+          <input id="contact-web-label" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Etiqueta web" />
+          <input id="contact-web-text" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Texto web" />
+          <input id="contact-web-href" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Enlace web" />
+          <textarea id="footer-description" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600 h-20 resize-none" placeholder="Descripción footer"></textarea>
+          <input id="footer-copyright" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Copyright footer" />
+          <input id="footer-organizer" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" placeholder="Organizador footer" />
+          <div class="mt-6 rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-4 space-y-4">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <h3 class="text-lg font-bold text-cyan-200">Registros sincronizados</h3>
+                <p class="text-sm text-cyan-50/80">Inscripciones recibidas desde Registro-GD.</p>
+              </div>
+              <button id="refresh-registrations-btn" type="button" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-lg font-bold text-sm">Actualizar registros</button>
+            </div>
+            <div id="synced-registrations-summary" class="text-sm text-cyan-100"></div>
+            <div id="synced-registrations-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="torneo" class="tab-panel">
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <h2 class="text-2xl font-bold mb-4">Editar Próximo Torneo</h2>
+          <div class="space-y-4">
+            <select id="status" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600">
+              <option value="cancelado">Cancelado</option>
+              <option value="activo">Activo</option>
+            </select>
+            <input id="date" type="text" placeholder="Fecha" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" />
+            <input id="time" type="text" placeholder="Hora" class="w-full p-3 bg-black/50 rounded-lg border border-gray-600" />
+            <textarea id="torneo-title" placeholder="Título" class="w-full p-3 bg-white/10 rounded-lg border border-gray-600 h-20 resize-none"></textarea>
+            <textarea id="torneo-message" placeholder="Mensaje" class="w-full p-3 bg-white/10 rounded-lg border border-gray-600 h-24 resize-none"></textarea>
+            <div class="flex gap-2 flex-wrap">
+              <button id="save-torneo-btn" type="button" onclick="saveTorneo()" class="flex-1 bg-green-600 hover:bg-green-700 p-3 rounded-lg font-bold transition-all">Guardar</button>
+              <button id="load-torneo-btn" type="button" onclick="loadTorneo()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-bold transition-all">Cargar</button>
+              <button id="reset-torneo-btn" type="button" onclick="resetTorneo()" class="flex-1 bg-gray-600 hover:bg-gray-700 p-3 rounded-lg font-bold transition-all">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div class="preview-box p-6 rounded-xl border-2 border-purple-500">
+          <h3 class="text-xl font-bold mb-4">Vista Previa</h3>
+          <div id="torneo-preview" class="text-center text-sm md:text-base"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reglas" class="tab-panel">
+      <h2 class="text-2xl font-bold mb-4">Editar Reglas</h2>
+      <div id="reglas-list-editor" class="space-y-3 mb-6 min-h-[200px]"></div>
+      <div class="flex gap-2 mb-6 flex-wrap">
+        <input id="new-regla" placeholder="Nueva regla..." class="flex-1 p-3 bg-white/10 rounded-lg border border-gray-600" />
+        <button id="add-regla-btn" type="button" onclick="addRegla()" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-bold">+</button>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button id="save-reglas-btn" type="button" onclick="saveReglas()" class="flex-1 bg-green-600 hover:bg-green-700 p-3 rounded-lg font-bold">Guardar</button>
+        <button id="load-reglas-btn" type="button" onclick="loadReglas()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-bold">Cargar</button>
+        <button id="reset-reglas-btn" type="button" onclick="resetReglas()" class="flex-1 bg-gray-600 hover:bg-gray-700 p-3 rounded-lg font-bold">Reset</button>
+      </div>
+      <div class="preview-box mt-8 p-6 rounded-xl">
+        <h3 class="text-xl font-bold mb-4">Vista Previa</h3>
+        <ul id="reglas-preview" class="space-y-2 text-sm"></ul>
+      </div>
+    </section>
+
+    <section id="galeria" class="tab-panel">
+      <h2 class="text-2xl font-bold mb-4">Editar Galería</h2>
+      <div id="galeria-list" class="space-y-3 mb-6 min-h-[200px]"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <input id="new-image" placeholder="URL/Ruta imagen" class="p-3 bg-white/10 rounded-lg border border-gray-600" />
+        <input id="new-caption" placeholder="Caption" class="p-3 bg-white/10 rounded-lg border border-gray-600" />
+        <button id="add-galeria-btn" type="button" onclick="addGaleria()" class="md:col-span-2 bg-green-600 hover:bg-green-700 p-3 rounded-lg font-bold">+ Agregar Imagen</button>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button id="save-galeria-btn" type="button" onclick="saveGaleria()" class="flex-1 bg-green-600 hover:bg-green-700 p-3 rounded-lg font-bold">Guardar</button>
+        <button id="load-galeria-btn" type="button" onclick="loadGaleria()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-bold">Cargar</button>
+        <button id="reset-galeria-btn" type="button" onclick="resetGaleria()" class="flex-1 bg-gray-600 hover:bg-gray-700 p-3 rounded-lg font-bold">Reset</button>
+      </div>
+      <div class="preview-box mt-8 p-6 rounded-xl">
+        <h3 class="text-xl font-bold mb-4">Vista Previa Slides</h3>
+        <div id="galeria-preview" class="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-64 overflow-y-auto"></div>
+      </div>
+    </section>
+
+    <div class="mt-12 pt-8 border-t border-gray-700 text-center flex gap-4 flex-wrap justify-center">
+      <button id="save-all-btn" type="button" onclick="saveAll()" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-lg font-bold text-lg transition-all">💾 Guardar Todo</button>
+      <button id="load-all-btn" type="button" onclick="loadAll()" class="bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-lg font-bold text-lg transition-all">📥 Cargar Todo</button>
+      <button id="reset-all-btn" type="button" onclick="resetAll()" class="bg-red-600 hover:bg-red-700 px-8 py-4 rounded-lg font-bold text-lg transition-all">🔄 Reset Todo</button>
+    </div>
+  </main>
+
+  <div id="admin-auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+    <div class="bg-gradient-to-br from-gray-900 via-purple-900/30 to-indigo-900 border border-purple-500/50 rounded-3xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl shadow-purple-500/25">
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-2">Acceso al Admin</h2>
+        <p class="text-gray-400 text-sm">Autentícate para acceder al panel de administración</p>
+      </div>
+
+      <form id="auth-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Usuario</label>
+          <input id="auth-username" type="text" required autocomplete="username" class="w-full px-4 py-3 bg-white/10 border border-gray-600/50 rounded-xl text-white">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+          <input id="auth-password" type="password" required autocomplete="current-password" class="w-full px-4 py-3 bg-white/10 border border-gray-600/50 rounded-xl text-white">
+        </div>
+        <div id="auth-error" class="text-red-400 text-sm hidden p-2 bg-red-500/10 rounded-lg border border-red-500/30"></div>
+        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-xl">Entrar al Admin</button>
+      </form>
+
+      <button id="cancel-auth-btn" class="w-full mt-4 text-gray-400 hover:text-white transition-colors text-sm underline">Cancelar</button>
+
+      <div class="mt-6 pt-6 border-t border-gray-700 text-xs text-gray-500 text-center">
+        <p>Usuario: compu@ • 3 intentos máximos • 30s bloqueo</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DATA_KEYS = {
+      torneo: 'proximoTorneo',
+      reglas: 'reglas',
+      galeria: 'galeria',
+      page: 'pageContent'
+    };
+
+    let isAuthenticated = false;
+
+    function mergeDeep(baseValue, overrideValue) {
+      if (Array.isArray(baseValue)) {
+        return Array.isArray(overrideValue) ? overrideValue : baseValue.slice();
+      }
+
+      if (baseValue && typeof baseValue === 'object') {
+        const result = {};
+        const overrideObject = overrideValue && typeof overrideValue === 'object' ? overrideValue : {};
+
+        Object.keys(baseValue).forEach(function(key) {
+          result[key] = mergeDeep(baseValue[key], overrideObject[key]);
+        });
+
+        Object.keys(overrideObject).forEach(function(key) {
+          if (!(key in result)) {
+            result[key] = overrideObject[key];
+          }
+        });
+
+        return result;
+      }
+
+      return overrideValue !== undefined ? overrideValue : baseValue;
+    }
+
+    function loadData(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveData(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function getPageContent() {
+      if (window.GamingDayRegistrationSync) {
+        window.GamingDayRegistrationSync.normalizePageContentRegistrationLinks();
+      }
+      return mergeDeep(DEFAULT_PAGE_CONTENT, loadData(DATA_KEYS.page, {}));
+    }
+
+    function getRegistrationUrl(url) {
+      if (window.GamingDayRegistrationSync) {
+        return window.GamingDayRegistrationSync.getRegistrationUrl(url);
+      }
+
+      return sanitize(url);
+    }
+
+    function renderSyncedRegistrations(manualRegistrations) {
+      const summary = document.getElementById('synced-registrations-summary');
+      const list = document.getElementById('synced-registrations-list');
+      if (!summary || !list) return;
+
+      const sync = window.GamingDayRegistrationSync;
+      summary.textContent = 'Actualizando registros sincronizados...';
+      list.innerHTML = '<div class="rounded-lg border border-dashed border-cyan-400/40 p-4 text-sm text-cyan-50/80">Consultando registros del portal...</div>';
+
+      Promise.resolve(sync && typeof sync.getMergedRegistrationsAsync === 'function'
+        ? sync.getMergedRegistrationsAsync(manualRegistrations)
+        : {
+            syncedRegistrations: sync ? sync.getStoredRegistrations() : [],
+            registrations: sync ? sync.getMergedRegistrations(manualRegistrations) : manualRegistrations,
+            remote: false,
+            error: null
+          }
+      ).then(function(state) {
+        const syncedRegistrations = Array.isArray(state.syncedRegistrations) ? state.syncedRegistrations : [];
+        const allRegistrations = Array.isArray(state.registrations) ? state.registrations : [];
+
+        if (state.error) {
+          summary.textContent = syncedRegistrations.length
+            ? syncedRegistrations.length + ' registro(s) en cache local • conexion remota no disponible'
+            : 'No se pudo consultar el portal de registros en este momento.';
+
+          if (!syncedRegistrations.length) {
+            list.innerHTML = '<div class="rounded-lg border border-dashed border-amber-300/40 bg-amber-500/10 p-4 text-sm text-amber-100">La conexion con el registro remoto fallo. Configura el endpoint en defaults.js o intenta nuevamente.</div>';
+            return;
+          }
+        } else {
+          summary.textContent = syncedRegistrations.length
+            ? syncedRegistrations.length + ' registro(s) sincronizado(s) • ' + allRegistrations.length + ' disponibles en el verificador'
+            : 'Todavía no hay registros sincronizados desde el portal.';
+
+          if (!syncedRegistrations.length) {
+            list.innerHTML = '<div class="rounded-lg border border-dashed border-cyan-400/40 p-4 text-sm text-cyan-50/80">Cuando alguien se registre en Registro-GD, aparecerá aquí automáticamente.</div>';
+            return;
+          }
+        }
+
+        list.innerHTML = syncedRegistrations.map(function(registration) {
+        const games = Array.isArray(registration.games) && registration.games.length ? registration.games.join(', ') : 'No indicado';
+        const group = registration.group ? registration.group + 'mo' : 'Sin grupo';
+        const code = registration.code || 'Sin codigo';
+        const registeredAt = registration.registeredAt ? new Date(registration.registeredAt).toLocaleString('es-PR') : 'Sin fecha';
+
+        return '<article class="rounded-lg border border-cyan-400/20 bg-black/20 p-3 space-y-1">' +
+          '<div class="flex items-center justify-between gap-3 flex-wrap">' +
+          '<strong class="text-cyan-100">' + (registration.name || 'Jugador sin nombre') + '</strong>' +
+          '<span class="text-xs text-cyan-50/70">' + registeredAt + '</span>' +
+          '</div>' +
+          '<p class="text-sm text-cyan-50/90">' + (registration.email || 'Sin correo') + '</p>' +
+          '<p class="text-xs text-cyan-50/70">Grupo: ' + group + ' • Juegos: ' + games + '</p>' +
+          '<p class="text-xs text-cyan-50/70">Codigo: ' + code + '</p>' +
+          '</article>';
+        }).join('');
+      });
+    }
+
+    function showMessage(text, type) {
+      const box = document.getElementById('flash-message');
+      box.textContent = text;
+      box.className = 'mb-6 p-4 rounded-lg ' + (type === 'error' ? 'bg-red-600/80' : 'bg-green-600/80');
+      box.classList.remove('hidden');
+      setTimeout(function() {
+        box.classList.add('hidden');
+      }, 3000);
+    }
+
+    function sanitize(value) {
+      return typeof value === 'string' ? value.trim() : value;
+    }
+
+    function splitLines(value) {
+      return value.split('\n').map(function(item) {
+        return item.trim();
+      }).filter(Boolean);
+    }
+
+    function setValue(id, value) {
+      const field = document.getElementById(id);
+      if (field) {
+        field.value = value == null ? '' : value;
+      }
+    }
+
+    function setChecked(id, value) {
+      const field = document.getElementById(id);
+      if (field) {
+        field.checked = Boolean(value);
+      }
+    }
+
+    function updateCountdownPreview() {
+      const days = document.getElementById('hero-countdown-days-label');
+      const hours = document.getElementById('hero-countdown-hours-label');
+      const minutes = document.getElementById('hero-countdown-minutes-label');
+      const seconds = document.getElementById('hero-countdown-seconds-label');
+      const daysValue = document.getElementById('hero-countdown-days-value');
+      const hoursValue = document.getElementById('hero-countdown-hours-value');
+      const minutesValue = document.getElementById('hero-countdown-minutes-value');
+      const secondsValue = document.getElementById('hero-countdown-seconds-value');
+
+      if (days) document.getElementById('hero-countdown-days-preview').textContent = days.value || 'Días';
+      if (hours) document.getElementById('hero-countdown-hours-preview').textContent = hours.value || 'Horas';
+      if (minutes) document.getElementById('hero-countdown-minutes-preview').textContent = minutes.value || 'Minutos';
+      if (seconds) document.getElementById('hero-countdown-seconds-preview').textContent = seconds.value || 'Segundos';
+      if (daysValue) document.getElementById('hero-countdown-days-value-preview').textContent = daysValue.value || '00';
+      if (hoursValue) document.getElementById('hero-countdown-hours-value-preview').textContent = hoursValue.value || '19';
+      if (minutesValue) document.getElementById('hero-countdown-minutes-value-preview').textContent = minutesValue.value || '59';
+      if (secondsValue) document.getElementById('hero-countdown-seconds-value-preview').textContent = secondsValue.value || '12';
+    }
+
+    function renderCollectionEditor(containerId, items, mapper) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = items.map(mapper).join('');
+    }
+
+    function loadGeneral() {
+      const content = getPageContent();
+      setValue('header-title', content.header.title);
+      setValue('header-subtitle', content.header.subtitle);
+      setValue('header-pcb-label', content.header.pcbLabel);
+      setValue('header-pcb-mobile-label', content.header.pcbMobileLabel);
+      setValue('header-pcb-href', content.header.pcbHref);
+      setChecked('notification-visible', content.notification.visible);
+      setValue('notification-title', content.notification.title);
+      setValue('notification-message', content.notification.message);
+      setValue('hero-title', content.hero.title);
+      setValue('hero-subtitle', content.hero.subtitle);
+      setValue('hero-primary-label', content.hero.primaryButtonLabel);
+      setValue('hero-primary-href', content.hero.primaryButtonHref);
+      setValue('hero-secondary-label', content.hero.secondaryButtonLabel);
+      setValue('hero-secondary-href', content.hero.secondaryButtonHref);
+      setValue('hero-countdown-label', content.hero.countdownLabel);
+      setValue('hero-countdown-target', content.hero.countdownTarget.slice(0, 16));
+      setValue('hero-live-message', content.hero.liveMessage);
+      setValue('hero-countdown-days-label', content.hero.countdownUnits.days);
+      setValue('hero-countdown-hours-label', content.hero.countdownUnits.hours);
+      setValue('hero-countdown-minutes-label', content.hero.countdownUnits.minutes);
+      setValue('hero-countdown-seconds-label', content.hero.countdownUnits.seconds);
+      setValue('hero-countdown-days-value', content.hero.countdownPreviewValues.days);
+      setValue('hero-countdown-hours-value', content.hero.countdownPreviewValues.hours);
+      setValue('hero-countdown-minutes-value', content.hero.countdownPreviewValues.minutes);
+      setValue('hero-countdown-seconds-value', content.hero.countdownPreviewValues.seconds);
+      updateCountdownPreview();
+      setValue('about-title', content.about.title);
+      setValue('about-body', content.about.body);
+      setValue('about-objective-title', content.about.objectiveTitle);
+      setValue('about-objective-body', content.about.objectiveBody);
+      setValue('games-title', content.games.title);
+      setValue('games-description', content.games.description);
+      setValue('upcoming-title', content.upcoming.title);
+      setValue('upcoming-description', content.upcoming.description);
+      setValue('rules-title', content.rules.title);
+      setValue('rules-description', content.rules.description);
+      setValue('gallery-title', content.galleryMeta.title);
+      setValue('gallery-subtitle', content.galleryMeta.subtitle);
+      setValue('schedule-title', content.schedule.title);
+      setValue('schedule-col-1-title', content.schedule.columns[0].title);
+      setValue('schedule-col-1-items', content.schedule.columns[0].items.join('\n'));
+      setValue('schedule-col-1-secondary-title', content.schedule.columns[0].secondaryTitle || '');
+      setValue('schedule-col-1-secondary-items', (content.schedule.columns[0].secondaryItems || []).join('\n'));
+      setValue('schedule-col-2-title', content.schedule.columns[1].title);
+      setValue('schedule-col-2-items', content.schedule.columns[1].items.join('\n'));
+      setValue('bracket-title', content.bracket.title);
+      setValue('bracket-description', content.bracket.description);
+      setValue('trailers-title', content.trailers.title);
+      setValue('trailers-description', content.trailers.description);
+      setValue('impostor-title', content.trailers.impostor.title);
+      setValue('impostor-description', content.trailers.impostor.description);
+      setValue('register-title', content.register.title);
+      setValue('register-description', content.register.description);
+      setValue('register-button-label', content.register.buttonLabel);
+      setValue('register-button-href', getRegistrationUrl(content.register.buttonHref));
+      setValue('register-disclaimer', content.register.disclaimer);
+      setValue('verifier-title', content.verifier.title);
+      setValue('verifier-description', content.verifier.description);
+      setValue('verifier-placeholder', content.verifier.placeholder);
+      setValue('verifier-button-label', content.verifier.buttonLabel);
+      setValue('verifier-success-prefix', content.verifier.successPrefix);
+      setValue('verifier-success-suffix', content.verifier.successSuffix);
+      setValue('verifier-not-found', content.verifier.notFoundMessage);
+      setValue('contact-title', content.contact.title);
+      setValue('contact-description', content.contact.description);
+      setValue('contact-email-label', content.contact.emailLabel);
+      setValue('contact-email', content.contact.email);
+      setValue('contact-web-label', content.contact.webLabel);
+      setValue('contact-web-text', content.contact.webText);
+      setValue('contact-web-href', content.contact.webHref);
+      setValue('footer-description', content.footer.description);
+      setValue('footer-copyright', content.footer.copyright);
+      setValue('footer-organizer', content.footer.organizer);
+
+      renderCollectionEditor('games-editor', content.games.items, function(item, index) {
+        return '<div class="bg-white/10 rounded-lg p-3 space-y-2">' +
+          '<input data-collection="games" data-index="' + index + '" data-field="title" value="' + item.title + '" class="w-full p-2 bg-black/40 rounded border border-gray-700" placeholder="Nombre" />' +
+          '<input data-collection="games" data-index="' + index + '" data-field="href" value="' + item.href + '" class="w-full p-2 bg-black/40 rounded border border-gray-700" placeholder="Enlace" />' +
+          '<input data-collection="games" data-index="' + index + '" data-field="badge" value="' + (item.badge || '') + '" class="w-full p-2 bg-black/40 rounded border border-gray-700" placeholder="Badge" />' +
+          '<select data-collection="games" data-index="' + index + '" data-field="style" class="w-full p-2 bg-black/40 rounded border border-gray-700"><option value="primary"' + (item.style === 'primary' ? ' selected' : '') + '>Primario</option><option value="secondary"' + (item.style === 'secondary' ? ' selected' : '') + '>Secundario</option></select>' +
+          '</div>';
+      });
+
+      renderCollectionEditor('bracket-editor', content.bracket.rows, function(row, index) {
+        return '<div class="bg-white/10 rounded-lg p-3 grid md:grid-cols-2 gap-2">' +
+          '<input data-collection="bracket" data-index="' + index + '" data-field="game" value="' + row.game + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="Juego" />' +
+          '<input data-collection="bracket" data-index="' + index + '" data-field="first" value="' + row.first + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="1er lugar" />' +
+          '<input data-collection="bracket" data-index="' + index + '" data-field="second" value="' + row.second + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="2do lugar" />' +
+          '<input data-collection="bracket" data-index="' + index + '" data-field="third" value="' + row.third + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="3er lugar" />' +
+          '</div>';
+      });
+
+      renderCollectionEditor('trailers-editor', content.trailers.videos, function(video, index) {
+        return '<div class="bg-white/10 rounded-lg p-3 space-y-2">' +
+          '<input data-collection="trailers" data-index="' + index + '" data-field="title" value="' + video.title + '" class="w-full p-2 bg-black/40 rounded border border-gray-700" placeholder="Título" />' +
+          '<input data-collection="trailers" data-index="' + index + '" data-field="description" value="' + video.description + '" class="w-full p-2 bg-black/40 rounded border border-gray-700" placeholder="Descripción" />' +
+          '<input data-collection="trailers" data-index="' + index + '" data-field="embedUrl" value="' + video.embedUrl + '" class="w-full p-2 bg-black/40 rounded border border-gray-700" placeholder="URL embed" />' +
+          '</div>';
+      });
+
+      renderCollectionEditor('impostor-editor', content.trailers.impostor.images, function(image, index) {
+        return '<div class="bg-white/10 rounded-lg p-3 grid md:grid-cols-2 gap-2">' +
+          '<input data-collection="impostor" data-index="' + index + '" data-field="src" value="' + image.src + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="Ruta imagen" />' +
+          '<input data-collection="impostor" data-index="' + index + '" data-field="alt" value="' + image.alt + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="Alt" />' +
+          '</div>';
+      });
+
+      renderCollectionEditor('verifier-editor', content.verifier.registrations, function(registration, index) {
+        return '<div class="bg-white/10 rounded-lg p-3 grid md:grid-cols-2 gap-2">' +
+          '<input data-collection="verifier" data-index="' + index + '" data-field="email" value="' + registration.email + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="Email" />' +
+          '<input data-collection="verifier" data-index="' + index + '" data-field="name" value="' + registration.name + '" class="p-2 bg-black/40 rounded border border-gray-700" placeholder="Nombre" />' +
+          '</div>';
+      });
+
+      renderSyncedRegistrations(content.verifier.registrations);
+    }
+
+    function collectCollection(collectionName) {
+      const fields = Array.from(document.querySelectorAll('[data-collection="' + collectionName + '"]'));
+      const grouped = {};
+      fields.forEach(function(field) {
+        const index = field.dataset.index;
+        if (!grouped[index]) {
+          grouped[index] = {};
+        }
+        grouped[index][field.dataset.field] = sanitize(field.value);
+      });
+      return Object.keys(grouped).sort(function(a, b) { return Number(a) - Number(b); }).map(function(key) {
+        return grouped[key];
+      });
+    }
+
+    function saveGeneral() {
+      const content = getPageContent();
+      const data = {
+        header: {
+          title: sanitize(document.getElementById('header-title').value),
+          subtitle: sanitize(document.getElementById('header-subtitle').value),
+          pcbLabel: sanitize(document.getElementById('header-pcb-label').value),
+          pcbMobileLabel: sanitize(document.getElementById('header-pcb-mobile-label').value),
+          pcbHref: sanitize(document.getElementById('header-pcb-href').value)
+        },
+        notification: {
+          visible: document.getElementById('notification-visible').checked,
+          title: sanitize(document.getElementById('notification-title').value),
+          message: sanitize(document.getElementById('notification-message').value)
+        },
+        hero: {
+          title: sanitize(document.getElementById('hero-title').value),
+          subtitle: sanitize(document.getElementById('hero-subtitle').value),
+          primaryButtonLabel: sanitize(document.getElementById('hero-primary-label').value),
+          primaryButtonHref: getRegistrationUrl(document.getElementById('hero-primary-href').value),
+          secondaryButtonLabel: sanitize(document.getElementById('hero-secondary-label').value),
+          secondaryButtonHref: sanitize(document.getElementById('hero-secondary-href').value),
+          countdownLabel: sanitize(document.getElementById('hero-countdown-label').value),
+          countdownUnits: {
+            days: sanitize(document.getElementById('hero-countdown-days-label').value),
+            hours: sanitize(document.getElementById('hero-countdown-hours-label').value),
+            minutes: sanitize(document.getElementById('hero-countdown-minutes-label').value),
+            seconds: sanitize(document.getElementById('hero-countdown-seconds-label').value)
+          },
+          countdownPreviewValues: {
+            days: sanitize(document.getElementById('hero-countdown-days-value').value),
+            hours: sanitize(document.getElementById('hero-countdown-hours-value').value),
+            minutes: sanitize(document.getElementById('hero-countdown-minutes-value').value),
+            seconds: sanitize(document.getElementById('hero-countdown-seconds-value').value)
+          },
+          countdownTarget: sanitize(document.getElementById('hero-countdown-target').value),
+          liveMessage: sanitize(document.getElementById('hero-live-message').value)
+        },
+        about: {
+          title: sanitize(document.getElementById('about-title').value),
+          body: sanitize(document.getElementById('about-body').value),
+          objectiveTitle: sanitize(document.getElementById('about-objective-title').value),
+          objectiveBody: sanitize(document.getElementById('about-objective-body').value)
+        },
+        games: {
+          title: sanitize(document.getElementById('games-title').value),
+          description: sanitize(document.getElementById('games-description').value),
+          items: collectCollection('games')
+        },
+        upcoming: {
+          title: sanitize(document.getElementById('upcoming-title').value),
+          description: sanitize(document.getElementById('upcoming-description').value)
+        },
+        schedule: {
+          title: sanitize(document.getElementById('schedule-title').value),
+          columns: [
+            {
+              title: sanitize(document.getElementById('schedule-col-1-title').value),
+              items: splitLines(document.getElementById('schedule-col-1-items').value),
+              secondaryTitle: sanitize(document.getElementById('schedule-col-1-secondary-title').value),
+              secondaryItems: splitLines(document.getElementById('schedule-col-1-secondary-items').value)
+            },
+            {
+              title: sanitize(document.getElementById('schedule-col-2-title').value),
+              items: splitLines(document.getElementById('schedule-col-2-items').value)
+            }
+          ]
+        },
+        bracket: {
+          title: sanitize(document.getElementById('bracket-title').value),
+          description: sanitize(document.getElementById('bracket-description').value),
+          rows: collectCollection('bracket')
+        },
+        rules: {
+          title: sanitize(document.getElementById('rules-title').value),
+          description: sanitize(document.getElementById('rules-description').value)
+        },
+        galleryMeta: {
+          title: sanitize(document.getElementById('gallery-title').value),
+          subtitle: sanitize(document.getElementById('gallery-subtitle').value)
+        },
+        trailers: {
+          title: sanitize(document.getElementById('trailers-title').value),
+          description: sanitize(document.getElementById('trailers-description').value),
+          videos: collectCollection('trailers'),
+          impostor: {
+            title: sanitize(document.getElementById('impostor-title').value),
+            description: sanitize(document.getElementById('impostor-description').value),
+            images: collectCollection('impostor')
+          }
+        },
+        register: {
+          title: sanitize(document.getElementById('register-title').value),
+          description: sanitize(document.getElementById('register-description').value),
+          buttonLabel: sanitize(document.getElementById('register-button-label').value),
+          buttonHref: getRegistrationUrl(document.getElementById('register-button-href').value),
+          disclaimer: sanitize(document.getElementById('register-disclaimer').value)
+        },
+        verifier: {
+          title: sanitize(document.getElementById('verifier-title').value),
+          description: sanitize(document.getElementById('verifier-description').value),
+          placeholder: sanitize(document.getElementById('verifier-placeholder').value),
+          buttonLabel: sanitize(document.getElementById('verifier-button-label').value),
+          successPrefix: sanitize(document.getElementById('verifier-success-prefix').value),
+          successSuffix: sanitize(document.getElementById('verifier-success-suffix').value),
+          notFoundMessage: sanitize(document.getElementById('verifier-not-found').value),
+          registrations: collectCollection('verifier')
+        },
+        contact: {
+          title: sanitize(document.getElementById('contact-title').value),
+          description: sanitize(document.getElementById('contact-description').value),
+          emailLabel: sanitize(document.getElementById('contact-email-label').value),
+          email: sanitize(document.getElementById('contact-email').value),
+          webLabel: sanitize(document.getElementById('contact-web-label').value),
+          webText: sanitize(document.getElementById('contact-web-text').value),
+          webHref: sanitize(document.getElementById('contact-web-href').value)
+        },
+        footer: {
+          description: sanitize(document.getElementById('footer-description').value),
+          copyright: sanitize(document.getElementById('footer-copyright').value),
+          organizer: sanitize(document.getElementById('footer-organizer').value)
+        }
+      };
+
+      saveData(DATA_KEYS.page, data);
+      renderSyncedRegistrations(data.verifier.registrations);
+      showMessage('Contenido general guardado');
+    }
+
+    function resetGeneral() {
+      localStorage.removeItem(DATA_KEYS.page);
+      loadGeneral();
+      showMessage('Contenido general restaurado');
+    }
+
+    function loadTorneo() {
+      const data = loadData(DATA_KEYS.torneo, DEFAULT_PROXIMO_TORNEO);
+      setValue('status', data.status);
+      setValue('date', data.date);
+      setValue('time', data.time);
+      setValue('torneo-title', data.title);
+      setValue('torneo-message', data.message);
+      updateTorneoPreview(data);
+    }
+
+    function saveTorneo() {
+      const data = {
+        status: sanitize(document.getElementById('status').value),
+        date: sanitize(document.getElementById('date').value),
+        time: sanitize(document.getElementById('time').value),
+        title: sanitize(document.getElementById('torneo-title').value),
+        message: sanitize(document.getElementById('torneo-message').value)
+      };
+      saveData(DATA_KEYS.torneo, data);
+      updateTorneoPreview(data);
+      showMessage('Próximo torneo guardado');
+    }
+
+    function resetTorneo() {
+      localStorage.removeItem(DATA_KEYS.torneo);
+      loadTorneo();
+      showMessage('Próximo torneo restaurado');
+    }
+
+    function updateTorneoPreview(data) {
+      const cancelado = data.status === 'cancelado';
+      document.getElementById('torneo-preview').innerHTML =
+        '<div class="' + (cancelado ? 'bg-red-600' : 'bg-green-600') + ' text-white px-3 py-2 rounded-full font-bold mb-4 inline-block">' + (cancelado ? 'CANCELADO' : 'ACTIVO') + '</div>' +
+        '<div class="text-lg font-bold mb-2">' + data.title + '</div>' +
+        '<p class="text-gray-300 mb-3">' + data.message + '</p>' +
+        '<p class="text-sm text-gray-400">📅 ' + data.date + '</p>' +
+        '<p class="text-sm text-gray-400">⏰ ' + data.time + '</p>';
+    }
+
+    function loadReglas() {
+      const data = loadData(DATA_KEYS.reglas, DEFAULT_REGLAS);
+      const container = document.getElementById('reglas-list-editor');
+      container.innerHTML = data.map(function(rule, index) {
+        return '<div class="flex gap-2 items-start bg-white/10 p-3 rounded-lg">' +
+          '<textarea class="regla-input flex-1 bg-transparent resize-none border-none focus:outline-none" rows="3" data-index="' + index + '">' + rule + '</textarea>' +
+          '<button type="button" class="delete-regla bg-red-600 hover:bg-red-700 p-2 rounded-lg text-white" data-index="' + index + '">🗑️</button>' +
+          '</div>';
+      }).join('');
+      renderReglasPreview(data);
+    }
+
+    function saveReglas() {
+      const data = Array.from(document.querySelectorAll('.regla-input')).map(function(input) {
+        return sanitize(input.value);
+      }).filter(Boolean);
+      saveData(DATA_KEYS.reglas, data);
+      renderReglasPreview(data);
+      showMessage('Reglas guardadas');
+    }
+
+    function resetReglas() {
+      localStorage.removeItem(DATA_KEYS.reglas);
+      loadReglas();
+      showMessage('Reglas restauradas');
+    }
+
+    function renderReglasPreview(data) {
+      document.getElementById('reglas-preview').innerHTML = data.map(function(rule) {
+        return '<li>• ' + rule + '</li>';
+      }).join('');
+    }
+
+    function addRegla() {
+      const value = sanitize(document.getElementById('new-regla').value);
+      if (!value) return;
+      const current = Array.from(document.querySelectorAll('.regla-input')).map(function(input) {
+        return sanitize(input.value);
+      }).filter(Boolean);
+      current.push(value);
+      document.getElementById('new-regla').value = '';
+      saveData(DATA_KEYS.reglas, current);
+      loadReglas();
+    }
+
+    function loadGaleria() {
+      const data = loadData(DATA_KEYS.galeria, DEFAULT_GALERIA);
+      document.getElementById('galeria-list').innerHTML = data.map(function(item, index) {
+        return '<div class="galeria-item flex flex-col md:flex-row gap-3 bg-white/10 p-4 rounded-lg">' +
+          '<input name="image" value="' + item.image + '" class="flex-1 p-2 bg-white/20 rounded border border-gray-600" />' +
+          '<input name="caption" value="' + item.caption + '" class="flex-1 p-2 bg-white/20 rounded border border-gray-600" />' +
+          '<button type="button" class="delete-galeria bg-red-600 hover:bg-red-700 p-2 rounded text-white" data-index="' + index + '">🗑️</button>' +
+          '</div>';
+      }).join('');
+      renderGaleriaPreview(data);
+    }
+
+    function saveGaleria() {
+      const data = Array.from(document.querySelectorAll('#galeria-list .galeria-item')).map(function(item) {
+        return {
+          image: sanitize(item.querySelector('[name="image"]').value),
+          caption: sanitize(item.querySelector('[name="caption"]').value)
+        };
+      }).filter(function(item) {
+        return item.image;
+      });
+      saveData(DATA_KEYS.galeria, data);
+      renderGaleriaPreview(data);
+      showMessage('Galería guardada');
+    }
+
+    function resetGaleria() {
+      localStorage.removeItem(DATA_KEYS.galeria);
+      loadGaleria();
+      showMessage('Galería restaurada');
+    }
+
+    function renderGaleriaPreview(data) {
+      document.getElementById('galeria-preview').innerHTML = data.map(function(item) {
+        return '<div class="bg-gray-800 rounded overflow-hidden"><img src="' + item.image + '" alt="' + item.caption + '" class="w-full h-24 object-cover" /><p class="p-2 text-xs text-gray-300">' + item.caption + '</p></div>';
+      }).join('');
+    }
+
+    function addGaleria() {
+      const image = sanitize(document.getElementById('new-image').value);
+      const caption = sanitize(document.getElementById('new-caption').value);
+      if (!image) return;
+      const current = loadData(DATA_KEYS.galeria, DEFAULT_GALERIA).slice();
+      current.push({ image: image, caption: caption });
+      saveData(DATA_KEYS.galeria, current);
+      document.getElementById('new-image').value = '';
+      document.getElementById('new-caption').value = '';
+      loadGaleria();
+    }
+
+    function saveAll() {
+      saveGeneral();
+      saveTorneo();
+      saveReglas();
+      saveGaleria();
+      showMessage('Todo guardado');
+    }
+
+    function loadAll() {
+      loadGeneral();
+      loadTorneo();
+      loadReglas();
+      loadGaleria();
+      showMessage('Todo cargado');
+    }
+
+    function resetAll() {
+      localStorage.removeItem(DATA_KEYS.page);
+      localStorage.removeItem(DATA_KEYS.torneo);
+      localStorage.removeItem(DATA_KEYS.reglas);
+      localStorage.removeItem(DATA_KEYS.galeria);
+      loadAll();
+      showMessage('Todo restaurado');
+    }
+
+    function initTabs() {
+      const buttons = Array.from(document.querySelectorAll('.tab-btn'));
+      buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+          buttons.forEach(function(item) {
+            item.classList.remove('bg-purple-600');
+          });
+          document.querySelectorAll('.tab-panel').forEach(function(panel) {
+            panel.classList.remove('active');
+          });
+          button.classList.add('bg-purple-600');
+          document.getElementById(button.dataset.tab).classList.add('active');
+        });
+      });
+    }
+
+    function initAuth() {
+      document.getElementById('admin-auth-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('auth-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const username = document.getElementById('auth-username').value;
+        const password = document.getElementById('auth-password').value;
+        const error = document.getElementById('auth-error');
+        const modal = document.getElementById('admin-auth-modal');
+        let attempts = Number(modal.dataset.attempts || 0) + 1;
+        modal.dataset.attempts = String(attempts);
+
+        if (username === 'compu@' && password === 'admin4050%') {
+          isAuthenticated = true;
+          modal.classList.add('hidden');
+          document.body.style.overflow = '';
+          document.querySelector('main').classList.add('authenticated');
+          loadAll();
+          initTabs();
+          return;
+        }
+
+        if (attempts >= 3) {
+          error.textContent = '¡Demasiados intentos! Espera 30 segundos.';
+          error.classList.remove('hidden');
+          document.getElementById('auth-form').classList.add('shake');
+          setTimeout(function() {
+            modal.dataset.attempts = '0';
+            document.getElementById('auth-form').classList.remove('shake');
+          }, 30000);
+          return;
+        }
+
+        error.textContent = 'Credenciales incorrectas. Intento ' + attempts + '/3';
+        error.classList.remove('hidden');
+        document.getElementById('auth-form').classList.add('shake');
+        setTimeout(function() {
+          document.getElementById('auth-form').classList.remove('shake');
+        }, 500);
+      });
+
+      document.getElementById('cancel-auth-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+      });
+    }
+
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('delete-regla')) {
+        const index = Number(event.target.dataset.index);
+        const current = Array.from(document.querySelectorAll('.regla-input')).map(function(input) {
+          return sanitize(input.value);
+        }).filter(Boolean);
+        current.splice(index, 1);
+        saveData(DATA_KEYS.reglas, current);
+        loadReglas();
+      }
+
+      if (event.target.classList.contains('delete-galeria')) {
+        const index = Number(event.target.dataset.index);
+        const current = loadData(DATA_KEYS.galeria, DEFAULT_GALERIA).slice();
+        current.splice(index, 1);
+        saveData(DATA_KEYS.galeria, current);
+        loadGaleria();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initAuth();
+      ['hero-countdown-days-label', 'hero-countdown-hours-label', 'hero-countdown-minutes-label', 'hero-countdown-seconds-label', 'hero-countdown-days-value', 'hero-countdown-hours-value', 'hero-countdown-minutes-value', 'hero-countdown-seconds-value'].forEach(function(id) {
+        const field = document.getElementById(id);
+        if (field) {
+          field.addEventListener('input', updateCountdownPreview);
+        }
+      });
+      document.getElementById('add-game-btn').addEventListener('click', function() {
+        const content = getPageContent();
+        content.games.items.push({ title: 'Nuevo juego', href: '#', style: 'primary', badge: '' });
+        saveData(DATA_KEYS.page, content);
+        loadGeneral();
+      });
+
+      document.getElementById('refresh-registrations-btn').addEventListener('click', function() {
+        renderSyncedRegistrations(getPageContent().verifier.registrations);
+        showMessage('Registros sincronizados actualizados');
+      });
+
+      window.addEventListener('storage', function(event) {
+        const sync = window.GamingDayRegistrationSync;
+        if (!sync || !isAuthenticated) {
+          return;
+        }
+
+        if (event.key === sync.STORAGE_KEYS.registrations) {
+          renderSyncedRegistrations(getPageContent().verifier.registrations);
+        }
+      });
+
+      window.addEventListener('focus', function() {
+        if (isAuthenticated) {
+          renderSyncedRegistrations(getPageContent().verifier.registrations);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

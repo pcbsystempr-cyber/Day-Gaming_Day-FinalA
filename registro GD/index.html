@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
+    <meta name="theme-color" content="#070512" />
+    <meta name="color-scheme" content="dark" />
+    <title>GamerZone · Registro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        (function() {
+            const sharedScriptCandidates = {
+                defaults: [
+                    'https://pcbsystempr-cyber.github.io/Gaming_Day-F-D/defaults.js',
+                    '../Gaming_Day_F-D/defaults.js',
+                    '../Gaming_Day-F-D/defaults.js'
+                ],
+                sync: [
+                    'https://pcbsystempr-cyber.github.io/Gaming_Day-F-D/registration-sync.js',
+                    '../Gaming_Day_F-D/registration-sync.js',
+                    '../Gaming_Day-F-D/registration-sync.js'
+                ]
+            };
+
+            const loadScript = (sources) => new Promise((resolve, reject) => {
+                let currentIndex = 0;
+
+                const tryNext = () => {
+                    if (currentIndex >= sources.length) {
+                        reject(new Error('No se pudieron cargar los scripts compartidos.'));
+                        return;
+                    }
+
+                    const script = document.createElement('script');
+                    script.src = sources[currentIndex++];
+                    script.onload = () => resolve(script.src);
+                    script.onerror = () => {
+                        script.remove();
+                        tryNext();
+                    };
+                    document.head.appendChild(script);
+                };
+
+                tryNext();
+            });
+
+            window.GamingDaySharedScriptsReady = loadScript(sharedScriptCandidates.defaults)
+                .then(() => loadScript(sharedScriptCandidates.sync))
+                .catch((error) => {
+                    console.warn(error.message);
+                    return null;
+                });
+        })();
+    </script>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+    <div class="bg-glow glow-3"></div>
+
+    <main class="card">
+        <header class="card-header">
+            <div class="logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">GAMER<span class="logo-accent">ZONE</span></span>
+                <span class="logo-bracket">]</span>
+            </div>
+            <h1 class="title">REGISTRO DE JUGADOR</h1>
+            <p class="subtitle">Haz tu registro y entra a la arena</p>
+            <p class="portal-link">Portal oficial: <a href="https://pcbsystempr-cyber.github.io/Gaming_Day-F-D/" target="_blank" rel="noopener noreferrer">Gaming Day</a></p>
+        </header>
+
+        <section class="live-panel" aria-labelledby="livePanelTitle">
+            <div>
+                <p id="livePanelTitle" class="live-panel-label">Estado del registro</p>
+                <strong id="completionText" class="live-panel-title">0% completado</strong>
+            </div>
+            <div class="progress-bar" aria-hidden="true">
+                <span id="progressFill"></span>
+            </div>
+            <div class="player-preview" aria-live="polite">
+                <p class="preview-name" id="previewName">Jugador sin identificar</p>
+                <p class="preview-meta" id="previewMeta">Selecciona tus juegos y grupo para generar tu pase.</p>
+            </div>
+        </section>
+
+        <form id="registerForm" class="form" novalidate>
+            <div class="field">
+                <label for="fullname">Nombre completo</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Ej. Juan Pérez" autocomplete="off" required />
+                <small class="error" data-for="fullname"></small>
+            </div>
+
+            <div class="field">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" placeholder="player@gamer.gg" autocomplete="off" required />
+                <p class="delivery-note">Al completar el registro, recibirás un Gmail con tu código QR único.</p>
+                <small class="error" data-for="email"></small>
+            </div>
+
+            <div class="field">
+                <label>Juego <span class="hint">(elige uno o más)</span></label>
+                <div id="game" class="chips" role="group" aria-label="Juegos">
+                    <button type="button" class="chip" data-value="impostor">Impostor</button>
+                    <button type="button" class="chip" data-value="nba">NBA</button>
+                    <button type="button" class="chip" data-value="mario-kart">Mario Kart</button>
+                    <button type="button" class="chip" data-value="mortal-kombat">Mortal Kombat</button>
+                    <button type="button" class="chip" data-value="smash-bros">Smash Bros</button>
+                </div>
+                <p id="gameCounter" class="selection-note">Aun no has seleccionado juegos.</p>
+                <small class="error" data-for="game"></small>
+            </div>
+
+            <div class="field">
+                <label for="group">Grupo</label>
+                <select id="group" name="group" required>
+                    <option value="">Elige uno</option>
+                    <option value="9">9no</option>
+                    <option value="10">10mo</option>
+                    <option value="11">11mo</option>
+                    <option value="12">12mo</option>
+                </select>
+                <small class="error" data-for="group"></small>
+            </div>
+
+            <div class="fee-note">
+                <span class="fee-icon">💰</span>
+                <div>
+                    <strong>Requisito de inscripción:</strong>
+                    <span>Se debe abonar <b>$5.00 USD</b> para completar el registro y participar en los torneos.</span>
+                </div>
+            </div>
+
+            <label class="checkbox agreement-box" for="terms">
+                <input type="checkbox" id="terms" required />
+                <span class="box" aria-hidden="true"></span>
+                <span class="agreement-copy">
+                    <strong>Confirmo que estoy de acuerdo</strong>
+                    <span>Acepto los <a href="#privacyNotice">términos</a> y la <a href="#privacyNotice">política de privacidad</a>.</span>
+                </span>
+            </label>
+
+            <p id="privacyNotice" class="legal-copy">Al registrarte en Gaming Day, aceptas que la información proporcionada, como tu nombre completo, correo electrónico, grupo y juegos seleccionados, sea utilizada únicamente para gestionar tu inscripción, confirmar tu participación, organizar los torneos y comunicarnos contigo sobre aspectos relacionados con el evento; tus datos no serán vendidos ni compartidos con terceros ajenos a la organización salvo obligación legal, se conservarán solo durante el tiempo necesario para la administración del evento y, al completar el registro, declaras que la información ingresada es verídica y autorizas su tratamiento conforme a estas condiciones de privacidad y uso.</p>
+
+            <button type="submit" class="btn-submit" id="submitButton">
+                <span>COMPLETAR REGISTRO</span>
+            </button>
+        </form>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="successModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+            <div class="congrats-badge">🎉</div>
+            <h2 id="modalTitle" class="modal-title">¡FELICIDADES!</h2>
+            <p class="modal-congrats">Tu registro se completó exitosamente</p>
+            <p class="modal-sub">Tu pase fue generado y el sistema intentará enviarlo a tu Gmail con un código QR único.</p>
+            <div id="qrCanvas" class="qr-canvas"></div>
+            <p class="modal-code">Código: <span id="playerCode"></span></p>
+            <p class="modal-mail">Enviado a <span id="sentTo"></span></p>
+            <div class="modal-actions">
+                <a id="startMatchButton" class="btn-submit modal-primary-action" href="https://pcbsystempr-cyber.github.io/Gaming_Day-F-D/#games" target="_blank" rel="noopener noreferrer">INICIAR PARTIDA</a>
+                <a id="viewOfficialSite" class="btn-secondary" href="https://pcbsystempr-cyber.github.io/Gaming_Day-F-D/" target="_blank" rel="noopener noreferrer">IR AL PORTAL</a>
+                <a id="viewSelectedGame" class="btn-secondary" href="https://pcbsystempr-cyber.github.io/Gaming_Day-F-D/#games" target="_blank" rel="noopener noreferrer">VER TU JUEGO</a>
+                <button type="button" id="closeModal" class="btn-submit">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
